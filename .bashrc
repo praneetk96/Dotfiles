@@ -16,70 +16,56 @@ export PATH
 # export SYSTEMD_PAGER=
 
 # User specific aliases and functions
-alias s="fzf -e"
-alias l="lsd -a"
-alias n="nvim"
-alias bupdate="bash-it update stable"
-
-#############################################################################
-# to fetch system information
-#!/bin/sh
-host="$(hostname)"
-os="$(cat /etc/fedora-release)"
-kernel="$(uname -sr)"
-uptime="$(uptime -p | sed 's/up //')"
-packages="$(yum list installed | wc -l)"
-shell="$(basename ${SHELL})"
-
-if [ -z "${WM}" ]; then
-	if [ "${XDG_CURRENT_DESKTOP}" ]; then
-		envtype='DE'
-		WM="${XDG_CURRENT_DESKTOP}"
-	elif [ "${DESKTOP_SESSION}" ]; then
-		envtype='DE'
-		WM="${DESKTOP_SESSION}"
-	else
-		envtype='WM'
-		WM="$(tail -n 1 "${HOME}/.xinitrc" | cut -d ' ' -f 2)"
-	fi
-else
-	envtype='WM'
+if [ -d ~/.bashrc.d ]; then
+	for rc in ~/.bashrc.d/*; do
+		if [ -f "$rc" ]; then
+			. "$rc"
+		fi
+	done
 fi
 
-## DEFINE COLORS
+unset rc
 
-# probably don't change these
-bold="$(tput bold)"
-black="$(tput setaf 0)"
-red="$(tput setaf 1)"
-green="$(tput setaf 2)"
-yellow="$(tput setaf 3)"
-blue="$(tput setaf 4)"
-magenta="$(tput setaf 5)"
-cyan="$(tput setaf 6)"
-white="$(tput setaf 7)"
-reset="$(tput sgr0)"
+# Dracula theme for TTY
+if [ "$TERM" = "linux" ]; then
+	printf %b '\e[40m' '\e[8]' # set default background to color 0 'dracula-bg'
+	printf %b '\e[37m' '\e[8]' # set default foreground to color 7 'dracula-fg'
+	printf %b '\e]P0282a36'    # redefine 'black'          as 'dracula-bg'
+	printf %b '\e]P86272a4'    # redefine 'bright-black'   as 'dracula-comment'
+	printf %b '\e]P1ff5555'    # redefine 'red'            as 'dracula-red'
+	printf %b '\e]P9ff7777'    # redefine 'bright-red'     as '#ff7777'
+	printf %b '\e]P250fa7b'    # redefine 'green'          as 'dracula-green'
+	printf %b '\e]PA70fa9b'    # redefine 'bright-green'   as '#70fa9b'
+	printf %b '\e]P3f1fa8c'    # redefine 'brown'          as 'dracula-yellow'
+	printf %b '\e]PBffb86c'    # redefine 'bright-brown'   as 'dracula-orange'
+	printf %b '\e]P4bd93f9'    # redefine 'blue'           as 'dracula-purple'
+	printf %b '\e]PCcfa9ff'    # redefine 'bright-blue'    as '#cfa9ff'
+	printf %b '\e]P5ff79c6'    # redefine 'magenta'        as 'dracula-pink'
+	printf %b '\e]PDff88e8'    # redefine 'bright-magenta' as '#ff88e8'
+	printf %b '\e]P68be9fd'    # redefine 'cyan'           as 'dracula-cyan'
+	printf %b '\e]PE97e2ff'    # redefine 'bright-cyan'    as '#97e2ff'
+	printf %b '\e]P7f8f8f2'    # redefine 'white'          as 'dracula-fg'
+	printf %b '\e]PFffffff'    # redefine 'bright-white'   as '#ffffff'
+	clear
+fi
 
-# you can change these
-lc="${reset}${bold}${blue}"		# labels
-nc="${reset}${bold}${blue}"		# user and hostname
-ic="${reset}${bold}${white}"	# info
-c0="${reset}${white}"			# first color
 
-## OUTPUT
+# colorscript random
+fm6000 -c random -r -n -m 8 -g 8 -l 25
 
-cat <<EOF
-${c0}       _____
-${c0}      /   __/  ${nc}${USER}${ic}@${nc}${host}${reset}
-${c0}     |  /      ${lc}OS:        ${ic}${os}${reset}
-${c0}    _|  |_     ${lc}KERNEL:    ${ic}${kernel}${reset}
-${c0}   |_    _|    ${lc}UPTIME:    ${ic}${uptime}${reset}
-${c0}     |  |      ${lc}PACKAGES:  ${ic}${packages}${reset}
-${c0}   __/  |      ${lc}SHELL:     ${ic}${shell}${reset}
-${c0}  /____/       ${lc}${envtype}:        ${ic}${WM}${reset}
+# my aliases
+alias sch='sudo find / -name'
+alias nsfw='cd /home/praneet/Videos/vid'
+alias showintf='nmcli device status'
 
-EOF
-#############################################################################
+# config aliases
+alias qtileconf='code /home/praneet/.config/qtile/config.py'
+
+# youtube-dl aliases
+alias ytq='youtube-dl -F'
+alias ytd='youtube-dl --merge-output-format mkv -f'
+
+[ -f "/home/praneet/.ghcup/env" ] && source "/home/praneet/.ghcup/env" # ghcup-env
 
 # If not running interactively, don't do anything
 case $- in
