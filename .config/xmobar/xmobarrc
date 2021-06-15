@@ -6,14 +6,14 @@
 --  
 -- My XMobar's Configuration
 
-Config { font = "xft:Cantarell Bold:pixelsize:14:antialias=true:hinting=true"
-       , additionalFonts = [ "xft:Mononoki Nerd Font:pixelsize=14:antialias=true:hinting=true"
-                           , "xft:FontAwesome 5 Free:style=solid:pixelsize=14:antialias=true:hinting=true"
+Config { font = "xft:Mononoki Nerd Font:weight=bold:pixelsize=16:antialias=true:hinting=true"
+       , additionalFonts = ["xft:Mononoki Nerd Font:pixel=16:antialias=true:hinting=true"
+                           , "xft:FontAwesome:pixelsize=19"
                            ]
-       , borderColor = "#401d58"
+       , borderColor = "black"
        , border = TopB
-       , bgColor = "#401d58"
-       , fgColor = "#f5bdf7"
+       , bgColor = "#282c34"
+       , fgColor = "#ff6c6b"
        , alpha = 255
        , position = Top
        , textOffset = -1
@@ -25,69 +25,24 @@ Config { font = "xft:Cantarell Bold:pixelsize:14:antialias=true:hinting=true"
        , iconRoot = "/home/praneet/.xmonad/xpm/"  -- default: "."
        , allDesktops = True
        , overrideRedirect = True
-       , commands = [ -- Time and Date
-                      Run Date "<fn=2>\xf133 </fn> %a %_d %b %Y - (%I:%M %p) " "date" 10
-                      -- Weather monitor
-                    , Run Weather "VILK" ["-t","<fn=2>\xf2c9</fn> <station>: <tempC>C",
+       , commands = [ Run Weather "VIBN" ["-t","<station>: <tempC>C",
                                           "-L","18","-H","25",
                                           "--normal","green",
                                           "--high","red",
                                           "--low","lightblue"] 36000
-                      -- StdinReader
-                    , Run StdinReader
-                      -- Network up and down
-                    , Run Network "wlp3s0" ["-t", "<fn=2>\xf0aa </fn> <rx>kb <fn=2> \xf0ab </fn> <tx>kb"] 10
-                      -- CPU usage in percent
-                    , Run Cpu ["-t", "<fn=2>\xf108 </fn>: (<total>%)","-H","50","--high","red"] 20
-                      -- Ram used number and percent
-                    , Run Memory ["-t","<fn=2>\xf233 </fn>: <used>M (<usedratio>%)"] 20
-                      -- Runs custom script to check for pacman updates.
-                      -- This script is in my dotfiles repo in .local/bin.
-                    , Run Com "/home/praneet/.local/bin/pacupdate" [] "pacupdate" 36000
-                      -- This command prints system information with (-s) kernal name & (-r) kernel release
-                    , Run Com "uname" ["-s","-r"] "" 36000
-                      -- This command prints the username
-                    , Run Com "whoami" [] "myuser" 0
-                      -- Wireless card details
-                    , Run Wireless "wlp3s0" ["-t", "Wifi: [<qualitybar>] <essid>"] 10
-                      -- Volume level number
-                    , Run Volume "HDA-Intel" "Master" ["-t", "Vol: [<volumebar>] <status>"] 10
-                      -- Brightness level number
-                    , Run Brightness ["-t", "Brightness: [<bar>]"] 10  
-                    ] 
+                    , Run Network "enp2s0" ["-L","0","-H","32",
+                                          "--normal","green","--high","red"] 10
+                    , Run Wireless "wlp3s0" ["-L","0","-H","32",
+                                          "--normal","green","--high","red"] 10
+                    , Run Cpu ["-L","3","-H","50",
+                               "--normal","green","--high","red"] 10
+                    , Run Memory ["-t","Mem: <usedratio>%"] 10
+                    , Run Date "%a %_d %b %Y - (%I:%M %p)" "date" 50
+                    -- , Run Com "/home/praneet/.config/xmobar/trayer-padding-icon.sh" [] "trayerpad" 10"
+                    , Run UnsafeStdinReader
+                    ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " <icon=haskell_20.xpm/> | %StdinReader%}\
-                    \{| %cpu% | %memory% | <fc=#f5bdf7>Pacman:</fc> %pacupdate% | %date% "
+       , template = " %UnsafeStdinReader% }\
+                    \{ %cpu% | %memory% | %VIBN% | <fc=#ee9a00>%date%</fc>"
        }
-
--- config module to use in future
-  -- , position = Static { xpos = 0, ypos = 0, width = 1872, height = 20 }
-  -- , position = Top
-
--- comands to use in future
-  -- permits window managers to feed xmobar strings with <action> tags mixed with un-trusted content (e.g. window titles)
-  -- , Run UnsafeStdinReader
-  
-  -- , Run BatteryP ["BAT0"]
-                      --                 ["-t", "<acstatus><watts> (<left>%)",
-                      --                  "-L", "10", "-H", "80", "-p", "3",
-                      --                  "--", "-O", "<fc=green>On</fc> - ", "-i", "",
-                      --                  "-L", "-15", "-H", "-5",
-                      --                  "-l", "red", "-m", "blue", "-h", "green"
-                      --                  "-a", "notify-send -u critical 'Battery running out!!'",
-                      --                  "-A", "3"] 600
-
--- Modules to use in future
-   -- [ <icon=haskell_20.xpm/> ]
-   -- %HDA-Intel:Master%
-   -- %StdinReader%
-   -- %wlp3s0wi%
-   -- %bright%
-   -- %myuser%
-   -- <fc=#f5bdf7>Pacman:</fc> %pacupdate%
--- ICAO Code for some airports in India (The Weather module uses ICAO codes for weather information, google it!) 
-   -- VEBN > Varanasi Airport
-   -- VIDP > New Delhi/Palam IG Airport
-   -- VILK > Lucknow/Amausi Airport: %VILK%(In template)
-   -- VAID > Devi Ahilyabai Indore Airport
