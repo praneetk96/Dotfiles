@@ -1,5 +1,6 @@
+{-# OPTIONS_GHC -Wno-deferred-type-errors #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
 --
-
 -- xmonad example config file.
 --
 -- A template showing all available configuration hooks,
@@ -8,24 +9,85 @@
 -- Normally, you'd only override those defaults you care about.
 --
 
+  -- Base
 import XMonad
-import Data.Monoid
-import System.Exit
-import XMonad.Actions.NoBorders
-import XMonad.Hooks.ManageDocks
-import XMonad.Layout.Gaps
-import XMonad.Layout.Spacing
-import XMonad.Util.EZConfig
-import XMonad.Util.Run
-import XMonad.Util.SpawnOnce
+import System.Directory
+import System.IO (hPutStrLn)
+import System.Exit (exitSuccess, exitWith, ExitCode(..))
 import qualified XMonad.StackSet as W
-import qualified Data.Map        as M
+
+    -- Actions
+import XMonad.Actions.CopyWindow (kill1)
+import XMonad.Actions.CycleWS (Direction1D(..), moveTo, shiftTo, WSType(..), nextScreen, prevScreen)
+import XMonad.Actions.GridSelect
+import XMonad.Actions.MouseResize
+import XMonad.Actions.Promote
+import XMonad.Actions.RotSlaves (rotSlavesDown, rotAllDown)
+import XMonad.Actions.WindowGo (runOrRaise)
+import XMonad.Actions.WithAll (sinkAll, killAll)
+import qualified XMonad.Actions.Search as S
+
+    -- Data
+import Data.Char (isSpace, toUpper)
+import Data.Maybe (fromJust)
+import Data.Monoid
+import Data.Maybe (isJust)
+import Data.Tree
+import qualified Data.Map as M
+
+    -- Hooks
+-- Hooks
+-- Hooks
+-- Hooks
+-- Hooks
+-- Hooks
+-- Hooks
+-- Hooks
+import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, xmobarPP, xmobarColor, shorten, PP(..), dynamicLog, defaultPP, statusBar)
+import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, also for xcomposite in obs.
+import XMonad.Hooks.ManageDocks (avoidStruts, docks, docksEventHook, manageDocks, ToggleStruts(..))
+import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat)
+import XMonad.Hooks.ServerMode
+import XMonad.Hooks.SetWMName
+import XMonad.Hooks.WorkspaceHistory
+
+    -- Layouts
+import XMonad.Layout.Accordion
+import XMonad.Layout.GridVariants (Grid(Grid))
+import XMonad.Layout.SimplestFloat
+import XMonad.Layout.Spiral
+import XMonad.Layout.ResizableTile
+import XMonad.Layout.Tabbed
+import XMonad.Layout.ThreeColumns
+
+    -- Layouts modifiers
+import XMonad.Layout.LayoutModifier
+import XMonad.Layout.LimitWindows (limitWindows, increaseLimit, decreaseLimit)
+import XMonad.Layout.Magnifier
+import XMonad.Layout.MultiToggle (mkToggle, single, EOT(EOT), (??))
+import XMonad.Layout.MultiToggle.Instances (StdTransformers(NBFULL, MIRROR, NOBORDERS))
+import XMonad.Layout.NoBorders
+import XMonad.Layout.Renamed
+import XMonad.Layout.ShowWName
+import XMonad.Layout.Simplest
+import XMonad.Layout.Spacing
+import XMonad.Layout.SubLayouts
+import XMonad.Layout.WindowArranger (windowArrange, WindowArrangerMsg(..))
+import qualified XMonad.Layout.ToggleLayouts as T (toggleLayouts, ToggleLayout(Toggle))
+import qualified XMonad.Layout.MultiToggle as MT (Toggle(..))
+
+   -- Utilities
+import XMonad.Util.Dmenu
+import XMonad.Util.EZConfig (additionalKeysP)
+import XMonad.Util.NamedScratchpad
+import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
+import XMonad.Util.SpawnOnce
+
 
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
 myTerminal      = "kitty"
-
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse = True
@@ -50,16 +112,30 @@ myModMask       = mod4Mask
 -- workspace name. The number of workspaces is determined by the length
 -- of this list.
 --
+customPP = defaultPP { ppCurrent = xmobarColor "#98be65" "" . wrap "[" "]"           -- Current workspace
+                     , ppHidden = xmobarColor "#82AAFF" "" . wrap "*" ""             -- Hidden workspaces
+                     , ppHiddenNoWindows = xmobarColor "#c792ea" ""                  -- Hidden workspaces (no windows)
+                     , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"            -- Urgent workspace
+                     , ppLayout = xmobarColor "#b3afc2" ""
+                     , ppTitle = xmobarColor "#b3afc2" "" . shorten 60               -- Title of active window
+                     , ppSep =  "<fc=#666666> <fn=1>|</fn> </fc>"                    -- Separator character
+                     }
+
 -- A tagging example:
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
 myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
+-- myWorkspaces = [" dev ", " www ", " sys ", " doc ", " vbox ", " chat ", " mus ", " vid ", " gfx "]
+myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..]
+
+clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
+     where i = fromJust $ M.lookup ws myWorkspaceIndices
 
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor  = "#dddddd"
-myFocusedBorderColor = "#2A3CBC"
+myFocusedBorderColor = "#ff0000"
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -69,11 +145,14 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch a terminal
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
+    -- launch google-chrome-stable
+    , ((modm,               xK_b     ), spawn "google-chrome-stable")
+
+    -- launch file manager
+    , ((modm,               xK_v     ), spawn "pcmanfm")
+
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn "dmenu_run")
-    
-    -- This module provides helper functions for dealing with 		window borders.
-    , ((modm,               xK_g     ), withFocused toggleBorder)
+    , ((modm,               xK_p     ), spawn "dmenu_run -b -fn Firamono-14 -nb '#45649D' -nf white -sf white")
 
     -- launch gmrun
     , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
@@ -191,7 +270,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = spacing 5 $ avoidStruts (tiled ||| Mirror tiled ||| Full)
+myLayout = spacing 6 $ avoidStruts (tiled ||| Mirror tiled ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -221,8 +300,18 @@ myLayout = spacing 5 $ avoidStruts (tiled ||| Mirror tiled ||| Full)
 -- 'className' and 'resource' are used below.
 --
 myManageHook = composeAll
-    [ className =? "MPlayer"        --> doFloat
+    [ manageDocks
+    , isFullscreen                  --> doFullFloat
+    , className =? "confirm"        --> doFloat
+    , className =? "file_progress"  --> doFloat
+    , className =? "dialog"         --> doFloat
+    , className =? "download"       --> doFloat
+    , className =? "error"          --> doFloat
+    , className =? "notification"   --> doFloat
     , className =? "Gimp"           --> doFloat
+    , className =? "splash"         --> doFloat
+    , className =? "toolbar"        --> doFloat
+    , title =? "google-chrome-stable"  --> doShift ( myWorkspaces !! 1 )
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore ]
 
@@ -246,6 +335,11 @@ myEventHook = mempty
 myLogHook = return ()
 
 ------------------------------------------------------------------------
+
+windowCount :: X (Maybe String)
+windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace . W.current . windowset
+
+------------------------------------------------------------------------
 -- Startup hook
 
 -- Perform an arbitrary action each time xmonad starts or is restarted
@@ -253,19 +347,41 @@ myLogHook = return ()
 -- per-workspace layout choices.
 --
 -- By default, do nothing.
--- myStartupHook = return ()
 myStartupHook = do
-        spawnOnce "nitrogen --restore &"
-        spawnOnce "compton &"
+    spawnOnce "nitrogen --restore &"
+    spawnOnce "dolphin --daemon &"
+    -- spawnOnce "kmail --startintray"
+    -- spawnOnce "telegram-desktop --startintray"
+    spawnOnce "picom &"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
 
 -- Run xmonad with the settings you specify. No need to modify this.
 --
-main = do 
-	xmproc <- spawnPipe "xmobar -x 0 /home/praneet/.config/xmobar/xmobarrc"
-	xmonad $ docks defaults
+main = do
+     xmproc <- spawnPipe "xmobar -x 0 /home/praneet/.config/xmobar/xmobarrc"
+     xmonad $ docks defaults
+
+-- main = xmonad =<< statusBar myBar myPP toggleStrutsKey myConfig
+
+-- myBar = "xmobar -x 0 /home/praneet/.config/xmobar/xmobarrc"
+
+-- myPP = xmobarPP { 
+--                ppCurrent = xmobarColor "#98be65" "" . wrap "[" "]"           -- Current workspace
+--              , ppVisible = xmobarColor "#98be65" "" . clickable              -- Visible but not current workspace
+--              , ppHidden = xmobarColor "#82AAFF" "" . wrap "*" "" . clickable -- Hidden workspaces
+--              , ppHiddenNoWindows = xmobarColor "#c792ea" ""  . clickable     -- Hidden workspaces (no windows)
+--              , ppTitle = xmobarColor "#b3afc2" "" . shorten 60               -- Title of active window
+--              , ppSep =  "<fc=#666666> <fn=1>|</fn> </fc>"                    -- Separator character
+--              , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"            -- Urgent workspace
+--              , ppExtras  = [windowCount]                                     -- # of windows current workspace
+--              , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]                    -- order of things in xmobar
+--                }
+
+-- toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_x)
+
+-- myConfig = def { modMask = mod4Mask }
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
@@ -292,7 +408,20 @@ defaults = def {
         layoutHook         = myLayout,
         manageHook         = myManageHook,
         handleEventHook    = myEventHook,
-        logHook            = myLogHook,
+        logHook = dynamicLogWithPP $ namedScratchpadFilterOutWorkspacePP $ xmobarPP
+              -- the following variables beginning with 'pp' are settings for xmobar.
+              { ppOutput = hPutStrLn xmproc
+              , ppCurrent = xmobarColor "#98be65" "" . wrap "[" "]"           -- Current workspace
+              , ppVisible = xmobarColor "#98be65" "" . clickable              -- Visible but not current workspace
+              , ppHidden = xmobarColor "#82AAFF" "" . wrap "*" "" . clickable -- Hidden workspaces
+              , ppHiddenNoWindows = xmobarColor "#c792ea" ""  . clickable     -- Hidden workspaces (no windows)
+              , ppTitle = xmobarColor "#b3afc2" "" . shorten 60               -- Title of active window
+              , ppSep =  "<fc=#666666> <fn=1>|</fn> </fc>"                    -- Separator character
+              , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"            -- Urgent workspace
+              , ppExtras  = [windowCount]                                     -- # of windows current workspace
+              , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]                    -- order of things in xmobar
+              }
+,
         startupHook        = myStartupHook
     }
 
