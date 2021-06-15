@@ -1,2 +1,2 @@
 # Dotfiles
-My Dotfiles from my Fedora Linux
+My Dotfiles from Fedora Linux
