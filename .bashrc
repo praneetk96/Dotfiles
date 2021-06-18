@@ -26,46 +26,18 @@ fi
 
 unset rc
 
-# Dracula theme for TTY
-if [ "$TERM" = "linux" ]; then
-	printf %b '\e[40m' '\e[8]' # set default background to color 0 'dracula-bg'
-	printf %b '\e[37m' '\e[8]' # set default foreground to color 7 'dracula-fg'
-	printf %b '\e]P0282a36'    # redefine 'black'          as 'dracula-bg'
-	printf %b '\e]P86272a4'    # redefine 'bright-black'   as 'dracula-comment'
-	printf %b '\e]P1ff5555'    # redefine 'red'            as 'dracula-red'
-	printf %b '\e]P9ff7777'    # redefine 'bright-red'     as '#ff7777'
-	printf %b '\e]P250fa7b'    # redefine 'green'          as 'dracula-green'
-	printf %b '\e]PA70fa9b'    # redefine 'bright-green'   as '#70fa9b'
-	printf %b '\e]P3f1fa8c'    # redefine 'brown'          as 'dracula-yellow'
-	printf %b '\e]PBffb86c'    # redefine 'bright-brown'   as 'dracula-orange'
-	printf %b '\e]P4bd93f9'    # redefine 'blue'           as 'dracula-purple'
-	printf %b '\e]PCcfa9ff'    # redefine 'bright-blue'    as '#cfa9ff'
-	printf %b '\e]P5ff79c6'    # redefine 'magenta'        as 'dracula-pink'
-	printf %b '\e]PDff88e8'    # redefine 'bright-magenta' as '#ff88e8'
-	printf %b '\e]P68be9fd'    # redefine 'cyan'           as 'dracula-cyan'
-	printf %b '\e]PE97e2ff'    # redefine 'bright-cyan'    as '#97e2ff'
-	printf %b '\e]P7f8f8f2'    # redefine 'white'          as 'dracula-fg'
-	printf %b '\e]PFffffff'    # redefine 'bright-white'   as '#ffffff'
-	clear
-fi
+# Completion for kitty
+source <(kitty + complete setup bash)
 
-
-# colorscript random
-# fm6000 -c random -r -n -m 8 -g 8 -l 25
-
-# my aliases
+# User Aliases
 alias sch='sudo find / -name'
-alias showintf='nmcli device status'
-alias tclock='tty-clock -n -c -t -C 4'
+alias tclk='tty-clock -c -t -C 4'
 
-# config aliases
-alias qtileconf='code /home/praneet/.config/qtile/config.py'
+# Kitty terminal specific aliases
+alias icat="kitty +kitten icat"
 
-# youtube-dl aliases
-alias ytq='youtube-dl -F'
-alias ytd='youtube-dl --merge-output-format mkv -f'
-
-[ -f "/home/praneet/.ghcup/env" ] && source "/home/praneet/.ghcup/env" # ghcup-env
+# Neofetch
+alias fetch='neofetch --size 25%'
 
 # If not running interactively, don't do anything
 case $- in
@@ -142,3 +114,12 @@ export SCM_CHECK=true
 
 # Load Bash It
 source "$BASH_IT"/bash_it.sh
+
+# Load pfetch
+#pfetch
+
+# Load NeoFetch
+neofetch --size 20%
+
+# Load any image
+#icat --align left --place 15x15@2x1 path_to/img.png
