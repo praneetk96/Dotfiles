@@ -1,2 +1,23 @@
-# Dotfiles
-My Dotfiles from Fedora Linux
+## My Config files on linux
+
+The dotfiles(config files) is not specific to any one linux distro these files can work on any linux distro.
+
+### My system(laptop) configuration
+
+**Make**: Asus
+
+**Model**: X556UQK
+
+**Operating System**: EndeavourOS
+
+**Processor**: Intel Core i5-7200U (7th Gen), 2 Core 4 Thread
+
+**RAM**: Upgraded to 8GB
+
+**Storage**: 1 TB HDD
+
+**GPU**:
+
+1. ***Integrated***: Intel HD Graphics 620
+  
+2. ***Dedicated***: Nvidia Geforce 940MX 2GB
