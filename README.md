@@ -1,8 +1,8 @@
-## My Config files on linux
+## My Config files on linux
 
 The dotfiles(config files) is not specific to any one linux distro these files can work on any linux distro.
 
-### My system(laptop) configuration
+### My system(laptop) configuration
 
 **Make**: Asus
 
@@ -12,12 +12,12 @@ The dotfiles(config files) is not specific to any one linux distro these files c
 
 **Processor**: Intel Core i5-7200U (7th Gen), 2 Core 4 Thread
 
-**RAM**: Upgraded to 8GB
+**RAM**: 4GB (Upgraded to 8GB)
 
 **Storage**: 1 TB HDD
 
-**GPU**:
+**GPU**: 
 
-1. ***Integrated***: Intel HD Graphics 620
-  
-2. ***Dedicated***: Nvidia Geforce 940MX 2GB
+- ***Integrated***: Intel HD Graphics 620 
+
+- ***Dedicated***: Nvidia Geforce 940MX 2GB
