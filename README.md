@@ -1,5 +1,7 @@
 ## My Config files on linux
 
+![Logo](https://raw.githubusercontent.com/praneetk96/Dotfiles/master/src/images/readmeBanner.jpg)
+
 The dotfiles(config files) is not specific to any one linux distro these files can work on any linux distro.
 
 ### My system(laptop) configuration
