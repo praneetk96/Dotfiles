@@ -11,7 +11,7 @@ The dotfiles(config files) is not specific to any one linux distro these files c
 
 **Model**: X556UQK
 
-**Operating System**: EndeavourOS
+**Operating System**: Fedora XFCE
 
 **Processor**: Intel Core i5-7200U (7th Gen), 2 Core 4 Thread
 
