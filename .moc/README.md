@@ -1,2 +1,2 @@
 ## Screenshot of my moc
-![mocp](https://github.com/praneetk96/Dotfiles/blob/master/src/images/mocp.png)
+![mocp](https://github.com/praneetk96/Dotfiles/blob/master/src/images/moc.png)
