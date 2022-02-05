@@ -33,7 +33,7 @@ error                = red       black     bold
 message              = green     black     bold
 plist_time           = green	 black	   bold 
 
-# Below lines were missing from example theme, otherwise the right side will look ugly!
+# Below lines were missing from example theme, otherwise the right side will look ugly
 selected_info        = black     magenta   bold
 marked_info          = magenta   default   bold
 marked_selected_info = default   magenta   bold
